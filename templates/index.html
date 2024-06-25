@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Cards</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body>
+       <!-- Navbar -->
+       <nav class="fixed top-0 w-full bg-white shadow-md z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-semibold text-gray-800">Public Servants</a>
+            <div>
+                <a href="#" class="text-gray-800 mx-2">Home</a>
+                <a href="#" class="text-gray-800 mx-2">Resources</a>
+                
+            </div>
+        </div>
+    </nav>
+        <!-- Form Container -->
+        <div class="max-w-md px-7 mt-16 mx-auto bg-white p-6 rounded-lg shadow-lg">
+            <form id="filterForm" class="space-y-4">
+                <div class="text-2xl px-4">
+                    <h1>List of Members of Parliament in Kenya till (2027)</h1>
+                    <p>115 VOTED NO</p>
+                    <p>204 VOTED YES</p>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <label for="countySelect" class="text-sm font-medium text-gray-700">County:</label>
+                    <select id="countySelect" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <option value="">Select County</option>
+                        <!-- Options dynamically populated via JavaScript -->
+                    </select>
+                </div>
+    
+                <div class="flex flex-col space-y-2">
+                    <label for="constituencySelect" class="text-sm font-medium text-gray-700">Constituency:</label>
+                    <select id="constituencySelect" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <option value="">Select Constituency</option>
+                        <!-- Options dynamically populated via JavaScript -->
+                    </select>
+                </div>
+    
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Filter</button>
+            </form>
+    
+            <div id="resultsContainer" class="mt-6">
+                <!-- Filtered results displayed here -->
+            </div>
+        </div>
+    <div class="container mx-auto mt-20 px-4 flex flex-col" id="profile-container">
+        <!-- Profile cards will be injected here by JavaScript -->
+    </div>
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            axios.get('/profiles')
+                .then(response => {
+                    const profiles = response.data;
+                    const profileContainer = document.getElementById('profile-container');
+
+                    profiles.forEach(profile => {
+                        const profileCard = document.createElement('a');
+                        profileCard.href = `/profile/${profile.id}`;
+                        profileCard.className = 'profile-card bg-white rounded-lg shadow-md p-6 block';
+
+                        profileCard.innerHTML = `
+                          <div class="profile-card bg-white p-6 rounded-lg shadow-md">
+                            <div class="card-image mb-4">
+                                <img src="${profile.image}" alt="Profile image" class="w-32 h-32 rounded-full mx-auto">
+                            </div>
+                            <div class="text-center">
+                                <p class="name text-xl font-semibold text-gray-800">${profile.name}</p>
+                                <p class="text-gray-600">County: ${profile.county}</p>
+                                <p class="text-gray-600 mt-2">Constituency: ${profile.constituency}</p>
+                                <p class="text-gray-600 mt-2">Party Affiliate: ${profile.party}</p>
+                                <p class="text-gray-600 mt-2">Voted: ${profile.vote || 'N/A'}</p>
+                            </div>
+                          </div>
+                        `;
+
+                        profileContainer.appendChild(profileCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching profiles:', error);
+                });
+        });
+    </script>
+</body>
+</html>
